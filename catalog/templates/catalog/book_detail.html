@@ -1,0 +1,86 @@
+{% extends "catalog/base_generic.html" %}
+{% block title %}{{ book.title }} — Home Library{% endblock %}
+
+{% block content %}
+  <div class="book-detail-header">
+    <h2>{{ book.title }}</h2>
+    <div class="actions">
+      <a href="{% url 'book-update' book.pk %}" class="btn">Edit</a>
+      <a href="{% url 'book-delete' book.pk %}" class="btn danger">Delete</a>
+    </div>
+  </div>
+
+  <div class="book-detail-content">
+    <div class="book-cover-container">
+      {% if book.cover_image %}
+        <img src="{{ book.cover_image.url }}" alt="Cover of {{ book.title }}" class="book-cover-large">
+      {% else %}
+        <div class="book-cover-large placeholder">No Cover Available</div>
+      {% endif %}
+    </div>
+
+    <div class="book-info">
+      <div class="info-row">
+        <span class="label">Author:</span>
+        <span class="value">
+          {% if book.author %}
+            <a href="{% url 'author-detail' book.author.pk %}">{{ book.author }}</a>
+          {% else %}
+            Unknown
+          {% endif %}
+        </span>
+      </div>
+
+      <div class="info-row">
+        <span class="label">ISBN:</span>
+        <span class="value">{{ book.isbn }}</span>
+      </div>
+
+      <div class="info-row">
+        <span class="label">Publication Date:</span>
+        <span class="value">{{ book.publication_date|date:"F j, Y"|default:"Unknown" }}</span>
+      </div>
+
+      <div class="info-row">
+        <span class="label">Genre:</span>
+        <span class="value">{{ book.genre|default:"Not specified" }}</span>
+      </div>
+
+      <div class="info-row">
+        <span class="label">Language:</span>
+        <span class="value">{{ book.language|default:"Not specified" }}</span>
+      </div>
+
+      <div class="info-row full-width">
+        <span class="label">Summary:</span>
+        <p class="summary">{{ book.summary }}</p>
+      </div>
+
+      <div class="loan-status">
+        <h3>Loan Status</h3>
+        {% if book.loan_set.all %}
+          <ul>
+            {% for loan in book.loan_set.all %}
+              <li>
+                {% if loan.returned %}
+                  Returned by {{ loan.borrower.name }} on {{ loan.return_date|date:"M d, Y" }}
+                {% else %}
+                  Currently loaned to {{ loan.borrower.name }} (Due: {{ loan.due_date|date:"M d, Y" }})
+                  {% if loan.is_overdue %}
+                    <span class="badge overdue">OVERDUE</span>
+                  {% endif %}
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>This book is currently available.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="back-link">
+    <a href="{% url 'books' %}" class="btn">← Back to All Books</a>
+  </div>
+{% endblock %}

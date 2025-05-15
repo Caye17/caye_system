@@ -1,0 +1,97 @@
+{% extends "catalog/base_generic.html" %}
+
+{% block title %}Loans — Home Library{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="header-row d-flex justify-content-between align-items-center mb-4">
+    <h2 style="font-family: 'Poppins', sans-serif; color: #333;">Loan Records</h2>
+    <a href="{% url 'loan-create' %}" class="btn btn-success btn-lg" style="background-color: #4caf50; border: none; padding: 12px 30px; border-radius: 8px; font-size: 1.1rem; transition: background-color 0.3s ease;">+ New Loan</a>
+  </div>
+
+  <a href="{% url 'home' %}" class="btn btn-secondary mb-3 rounded-pill" style="font-size: 1rem; padding: 10px 20px;">
+  ← Back
+</a>
+
+  <div class="filters mb-4">
+    <form method="get" class="d-flex align-items-center">
+      <input type="text" name="search" placeholder="Search loans..." class="form-control mr-2" value="{{ request.GET.search }}" style="font-size: 1rem; border-radius: 8px;">
+      <select name="status" class="form-control mr-2" style="font-size: 1rem; border-radius: 8px;">
+        <option value="">All Statuses</option>
+        <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active Loans</option>
+        <option value="overdue" {% if request.GET.status == 'overdue' %}selected{% endif %}>Overdue Loans</option>
+        <option value="returned" {% if request.GET.status == 'returned' %}selected{% endif %}>Returned Loans</option>
+      </select>
+      <button type="submit" class="btn btn-primary btn-lg" style="background-color: #5c6bc0; border: none; padding: 10px 25px; border-radius: 8px; font-size: 1rem;">Filter</button>
+    </form>
+  </div>
+
+  <div class="loan-table-container">
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+          <tr>
+            <th>Book</th>
+            <th>Borrower</th>
+            <th>Loan Date</th>
+            <th>Due Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for loan in object_list %}
+          <tr class="loan-row {% if loan.is_overdue %}overdue{% elif loan.returned %}returned{% else %}active{% endif %}">
+            <td>
+              <a href="{% url 'book-detail' loan.book.pk %}" class="book-title" style="color: #333; text-decoration: none; font-weight: bold; transition: color 0.3s ease;">
+                {{ loan.book.title }}
+              </a>
+            </td>
+            <td>
+              {% if loan.borrower %}
+                <a href="{% url 'borrower-detail' loan.borrower.pk %}" class="borrower-name" style="color: #333; text-decoration: none; transition: color 0.3s ease;">
+                  {{ loan.borrower.name }}
+                </a>
+              {% else %}
+                <span>No borrower assigned</span>
+              {% endif %}
+            </td>
+            <td>{{ loan.loan_date|date:"M d, Y" }}</td>
+            <td>{{ loan.due_date|date:"M d, Y" }}</td>
+            <td>
+              {% if loan.returned %}
+                <span class="badge badge-returned" style="background-color: #4caf50; color: white; padding: 6px 12px; border-radius: 20px; font-size: 1rem;">Returned</span>
+              {% elif loan.is_overdue %}
+                <span class="badge badge-overdue" style="background-color: #f44336; color: white; padding: 6px 12px; border-radius: 20px; font-size: 1rem;">Overdue</span>
+              {% else %}
+                <span class="badge badge-active" style="background-color: #5c6bc0; color: white; padding: 6px 12px; border-radius: 20px; font-size: 1rem;">Active</span>
+              {% endif %}
+            </td>
+            <td>
+              <a href="{% url 'loan-update' loan.pk %}" class="btn btn-sm btn-info" style="border-radius: 20px; padding: 6px 15px; font-size: 1rem; transition: background-color 0.3s ease;">Edit</a>
+              <a href="{% url 'loan-delete' loan.pk %}" class="btn btn-sm btn-danger" style="border-radius: 20px; padding: 6px 15px; font-size: 1rem; transition: background-color 0.3s ease;">Delete</a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center text-muted">No loan records found.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% if is_paginated %}
+  <div class="pagination d-flex justify-content-center mt-4">
+    {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="page-link" style="font-size: 1rem; padding: 8px 15px;">&laquo; Prev</a>
+    {% endif %}
+    <span class="current-page" style="font-size: 1rem; padding: 8px 15px;">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="page-link" style="font-size: 1rem; padding: 8px 15px;">Next &raquo;</a>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

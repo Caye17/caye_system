@@ -1,0 +1,14 @@
+{% extends "catalog/base_generic.html" %}
+
+{% block title %}{{ author.name }} — Home Library{% endblock %}
+
+{% block content %}
+<h2>{{ author.name }}</h2>
+<p>{{ author.biography }}</p>
+<h3>Books by {{ author.name }}</h3>
+<ul>
+  {% for book in author.books.all %}
+    <li><a href="{% url 'book-detail' book.pk %}">{{ book.title }}</a></li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends "catalog/base_generic.html" %}
+
+{% block title %}All Books — Home Library{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="header-row mb-4 d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+      <a href="{% url 'home' %}" class="btn btn-secondary rounded-pill me-3">← Back</a>
+      <h2 class="fw-bold mb-0">All Books</h2>
+    </div>
+    <a href="{% url 'book-create' %}" class="btn btn-success btn-lg rounded-pill">+ Add New Book</a>
+  </div>
+
+  <!-- Filters Section (Search and Dropdowns) -->
+  <div class="filters mb-4">
+    <form method="get" class="d-flex justify-content-between align-items-center">
+      <!-- Search Field -->
+      <input type="text" name="search" placeholder="Search books..." value="{{ request.GET.search }}" class="form-control me-2">
+      
+      <!-- Author Dropdown Filter -->
+      <select name="author" class="form-select me-2">
+        <option value="">All Authors</option>
+        {% for author in authors %}
+          <option value="{{ author.last_name }}" {% if request.GET.author == author.last_name %}selected{% endif %}>{{ author }}</option>
+        {% endfor %}
+      </select>
+
+      <!-- Genre Dropdown Filter -->
+      <select name="genre" class="form-select me-2">
+        <option value="">All Genres</option>
+        {% for genre in genres %}
+          <option value="{{ genre }}" {% if request.GET.genre == genre %}selected{% endif %}>{{ genre }}</option>
+        {% endfor %}
+      </select>
+
+      <!-- Filter Button -->
+      <button type="submit" class="btn btn-primary rounded-pill">Filter</button>
+    </form>
+  </div>
+
+  <!-- Book List Grid -->
+  <div class="book-grid row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for book in books %}
+      <div class="col">
+        <div class="card shadow-sm">
+          {% if book.cover_image %}
+            <img src="{{ book.cover_image.url }}" alt="Cover of {{ book.title }}" class="card-img-top book-cover">
+          {% else %}
+            <div class="card-img-top placeholder">No Cover</div>
+          {% endif %}
+          <div class="card-body">
+            <h5 class="card-title">{{ book.title }}</h5>
+            <p class="author text-muted">{% if book.author %}{{ book.author }}{% else %}Unknown Author{% endif %}</p>
+            <p class="genre text-muted">{{ book.genre|default:"No genre specified" }}</p>
+            <div class="d-flex justify-content-between">
+              <a href="{% url 'book-update' book.pk %}" class="btn btn-sm btn-primary rounded-pill">Edit</a>
+              <a href="{% url 'book-delete' book.pk %}" class="btn btn-sm btn-danger rounded-pill">Delete</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-center w-100">No books found matching your criteria.</p>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination Section -->
+  {% if is_paginated %}
+    <div class="pagination mt-4 d-flex justify-content-center">
+      {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.author %}&author={{ request.GET.author }}{% endif %}{% if request.GET.genre %}&genre={{ request.GET.genre }}{% endif %}" class="page-link">
+          &laquo; Prev
+        </a>
+      {% endif %}
+      <span class="current-page mx-3">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.author %}&author={{ request.GET.author }}{% endif %}{% if request.GET.genre %}&genre={{ request.GET.genre }}{% endif %}" class="page-link">
+          Next &raquo;
+        </a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

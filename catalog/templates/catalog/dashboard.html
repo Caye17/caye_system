@@ -1,0 +1,117 @@
+{% extends "catalog/base_generic.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero">
+    <h1 class="display-4">Welcome to the Library Dashboard</h1>
+    <p class="lead">Manage your collection, members, and transactions with ease.</p>
+</div>
+
+<!-- Stats Cards Section -->
+<div class="container py-5">
+    <div class="row text-center g-4">
+        <!-- Total Books -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="card-icon mb-3"><i class="bi bi-book"></i></div>
+                    <h5 class="card-title">Total Books</h5>
+                    <p class="card-text">{{ total_books }}</p>
+                    <a href="{% url 'books' %}" class="btn btn-primary">View Books</a>
+                    <a href="{% url 'book-create' %}" class="btn btn-success">Add New Book</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Authors -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="card-icon mb-3"><i class="bi bi-pencil"></i></div>
+                    <h5 class="card-title">Total Authors</h5>
+                    <p class="card-text">{{ total_authors }}</p>
+                    <a href="{% url 'authors' %}" class="btn btn-primary">View Authors</a>
+                    <a href="{% url 'author-create' %}" class="btn btn-success">Add New Author</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Borrowers -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="card-icon mb-3"><i class="bi bi-person"></i></div>
+                    <h5 class="card-title">Total Borrowers</h5>
+                    <p class="card-text">{{ total_borrowers }}</p>
+                    <a href="{% url 'borrowers' %}" class="btn btn-primary">View Borrowers</a>
+                    <a href="{% url 'borrower-create' %}" class="btn btn-success">Add New Borrower</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- More Stats Cards Section -->
+    <div class="row text-center g-4 mt-4">
+        <!-- Total Loans -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="card-icon mb-3"><i class="bi bi-journal-check"></i></div>
+                    <h5 class="card-title">Total Loans</h5>
+                    <p class="card-text">{{ total_loans }}</p>
+                    <a href="{% url 'loans' %}" class="btn btn-primary">View Loans</a>
+                    <a href="{% url 'loan-create' %}" class="btn btn-success">Create Loan</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Loans -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="card-icon mb-3"><i class="bi bi-arrow-repeat"></i></div>
+                    <h5 class="card-title">Active Loans</h5>
+                    <p class="card-text">{{ active_loans }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Returned Loans -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="card-icon mb-3"><i class="bi bi-check-circle"></i></div>
+                    <h5 class="card-title">Returned Loans</h5>
+                    <p class="card-text">{{ returned_loans }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Top Borrowers Table -->
+<h3>Top Borrowers</h3>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Borrower</th>
+            <th>Total Loans</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in loans_per_borrower %}
+        <tr>
+            <td>{{ entry.borrower.name }}</td>
+            <td>{{ entry.loan_count }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="2">No borrowers yet.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
